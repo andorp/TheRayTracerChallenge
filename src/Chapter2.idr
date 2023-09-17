@@ -198,17 +198,26 @@ emptyCanvasTheorem w h c p cp =
   , rewrite cp in Refl
   )
 
+finEqReflexive : (f : Fin n) -> ((f == f) === True)
+finEqReflexive FZ     = Refl
+finEqReflexive (FS x) = finEqReflexive x
+
+pointEqReflexive : {w,h : Nat} -> (p : Point w h) -> ((p == p) === True)
+pointEqReflexive (MkPoint x y)
+  = rewrite (finEqReflexive x) in
+    rewrite (finEqReflexive y) in
+    Refl
+
 -- writing to canvas
 pixelTheorem :
   (w,h : Nat)                   ->
   (c   : Canvas w h)            ->
   (p   : Point w h)             ->
-  (eq  : (p == p) === True)     -> -- This needs to be valid
   (k   : Color)                 ->
   (c === canvas w h)            ->
   --------------------------------
   (getPixel p (pixel p k c) === k)
-pixelTheorem w h c p eq k cp = rewrite cp in rewrite eq in Refl
+pixelTheorem w h c p k cp = rewrite cp in rewrite (pointEqReflexive p) in Refl
 
 ||| Constructing the PPM header
 export
