@@ -194,9 +194,6 @@ normalizeExample2 = Refl
 magnitudeNormalizeExample : magnitude (normalize (vector 1 2 3)) === 1.0
 magnitudeNormalizeExample = Refl
 
-magnitudeOfNormalizedTheorem : forall x , y , w , v . v === vector x y w -> magnitude (normalize v) === 1.0
-magnitudeOfNormalizedTheorem Refl = ?mRefl 
-
 fourAdditionDRefl :
   {a,b,c,d,a',b',c',d' : Double} ->
   DRefl a a' -> DRefl b b' -> DRefl c c' -> DRefl d d' ->
@@ -216,8 +213,8 @@ fourAdditionDRefl da db dc dd = CalcWith {leq=DRefl} $
   <~ a' + b' + c' + d'
     ... (Ref)
 
-magnitudeOfNormalizedTheorem2 : (v : Tuple) -> (magnitude (normalize v)) === 1.0
-magnitudeOfNormalizedTheorem2 (MkTuple x y z w) = Calc $
+magnitudeOfNormalizedTheorem : (v : Tuple) -> (magnitude (normalize v)) === 1.0
+magnitudeOfNormalizedTheorem (MkTuple x y z w) = Calc $
   |~ (magnitude (normalize (MkTuple x y z w)))
   ~~ (magnitude (let m = magnitude (MkTuple x y z w)
                  in MkTuple (x / m) (y / m) (z / m) (w / m)))
