@@ -6,8 +6,9 @@ import Syntax.PreorderReasoning
 import Syntax.PreorderReasoning.Generic
 import Control.Relation
 import Control.Order
-import DRefl
+import DoublePath
 
+public export
 record Tuple where
   constructor MkTuple
   x,y,z,w : Double
@@ -18,20 +19,29 @@ data IsPoint : Tuple -> Type where
 data IsVector : Tuple -> Type where
   Vector : (ok : So (w == 0.0)) -> IsVector (MkTuple x y z w)
 
+public export
 tuple : (x,y,z,w : Double) -> Tuple
 tuple = MkTuple
 
+export
 point : (x,y,z : Double) -> Tuple
 point x y z = MkTuple x y z 1.0
 
+export
 vector : (x,y,z : Double) -> Tuple
 vector x y z = MkTuple x y z 0.0
 
+export
 EPSILON : Double
 EPSILON = 0.00001
 
+export
 eq : Double -> Double -> Bool
 eq a b = abs (a - b) < EPSILON
+
+public export
+[WithEpsilon] Eq Double where
+  (==) = eq
 
 Eq Tuple where
   (MkTuple x0 y0 z0 w0) == (MkTuple x1 y1 z1 w1) = and [eq x0 x1, eq y0 y1, eq z0 z1, eq w0 w1]
@@ -196,9 +206,9 @@ magnitudeNormalizeExample = Refl
 
 fourAdditionDRefl :
   {a,b,c,d,a',b',c',d' : Double} ->
-  DRefl a a' -> DRefl b b' -> DRefl c c' -> DRefl d d' ->
-  DRefl (a + b + c + d) (a' + b' + c' + d')
-fourAdditionDRefl da db dc dd = CalcWith {leq=DRefl} $
+  DoublePath a a' -> DoublePath b b' -> DoublePath c c' -> DoublePath d d' ->
+  DoublePath (a + b + c + d) (a' + b' + c' + d')
+fourAdditionDRefl da db dc dd = CalcWith {leq=DoublePath} $
   |~ a + b + c + d
   <~ (((a + b) + c) + d)
     ... (Ref)  
@@ -240,15 +250,15 @@ magnitudeOfNormalizedTheorem (MkTuple x y z w) = Calc $
         + (y * y) / ((sqrt (x*x + y*y + z*z + w*w)) * (sqrt (x*x + y*y + z*z + w*w)))
         + (z * z) / ((sqrt (x*x + y*y + z*z + w*w)) * (sqrt (x*x + y*y + z*z + w*w)))
         + (w * w) / ((sqrt (x*x + y*y + z*z + w*w)) * (sqrt (x*x + y*y + z*z + w*w)))))
-    ... (cong sqrt (deq (fourAdditionDRefl DivMul DivMul DivMul DivMul)))
+    ... (cong sqrt (doublePathRefl (fourAdditionDRefl DivMul DivMul DivMul DivMul)))
   ~~ (sqrt
         (((x * x) / (x*x + y*y + z*z + w*w)) +
          ((y * y) / (x*x + y*y + z*z + w*w)) +
          ((z * z) / (x*x + y*y + z*z + w*w)) +
          ((w * w) / (x*x + y*y + z*z + w*w))))
-    ... (cong sqrt (deq (fourAdditionDRefl (DivDen SqrMul) (DivDen SqrMul) (DivDen SqrMul) (DivDen SqrMul))))
+    ... (cong sqrt (doublePathRefl (fourAdditionDRefl (DivDen SqrMul) (DivDen SqrMul) (DivDen SqrMul) (DivDen SqrMul))))
   ~~ (sqrt ((x*x + y*y + z*z + w*w) / (x*x + y*y + z*z + w*w)))
-    ... (cong sqrt (deq (CalcWith {leq=DRefl} $
+    ... (cong sqrt (doublePathRefl (CalcWith {leq=DoublePath} $
           |~ (((x*x)/(x*x+y*y+z*z+w*w))+((y*y)/(x*x+y*y+z*z+w*w))+((z*z)/(x*x+y*y+z*z+w*w))+((w*w)/(x*x+y*y+z*z+w*w)))
           <~ (((((x*x)/(x*x+y*y+z*z+w*w))+((y*y)/(x*x+y*y+z*z+w*w)))+((z*z)/(x*x+y*y+z*z+w*w)))+((w*w)/(x*x+y*y+z*z+w*w)))
             ... (Ref)
@@ -264,7 +274,7 @@ magnitudeOfNormalizedTheorem (MkTuple x y z w) = Calc $
           <~ ((x*x+y*y+z*z+w*w)/(x*x+y*y+z*z+w*w))
             ... (DivNum (Sym AddAsc)))))
   ~~ (sqrt 1.0)
-    ... (cong sqrt (deq DivSam))
+    ... (cong sqrt (doublePathRefl DivSam))
   ~~ 1.0
     ... (Refl)
 
