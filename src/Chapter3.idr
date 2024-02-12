@@ -7,19 +7,31 @@ import Data.Vect
 import Data.Fin
 import DoublePath
 
+public export
 record Matrix row col where
   constructor MkMatrix
   elems : Vect row (Vect col Double)
 
+-- MkMatrix
+--   [ [0,0,0,0]
+--   , [0,0,0,0]
+--   , [0,0,0,0]
+--   , [0,0,0,0]
+--   ]
+
+export
 Eq (Matrix row col) where
   MkMatrix e1 == MkMatrix e2 = all id $ zipWith (\r1 , r2 => all id $ zipWith eq r1 r2) e1 e2
 
+public export
 Matrix2x2 : Type
 Matrix2x2 = Matrix 2 2
 
+public export
 Matrix3x3 : Type
 Matrix3x3 = Matrix 3 3
 
+public export
 Matrix4x4 : Type
 Matrix4x4 = Matrix 4 4
 
@@ -147,12 +159,14 @@ data Invertible : Matrix n n -> Type where
     ------------------------------
     Invertible m
 
+public export
 invertible : (m : Matrix 4 4) -> Dec (Invertible m)
 invertible m with (determinant 4 m) proof p1
   _ | d with (decSo (d == 0.0))
     _ | Yes isZero = No (\(YesInvertible x {o} notZero) => notZero (doublePathRefl (EqS (rewrite (trans o p1) in isZero))))
     _ | No notZero = Yes (YesInvertible d {o=sym p1} (\dReflZero => notZero (reflToEq dReflZero)))
 
+public export
 inverse4 :
   (m : Matrix 4 4) ->
   (i : Invertible m) =>

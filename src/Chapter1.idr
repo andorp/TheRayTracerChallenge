@@ -23,7 +23,7 @@ public export
 tuple : (x,y,z,w : Double) -> Tuple
 tuple = MkTuple
 
-export
+public export
 point : (x,y,z : Double) -> Tuple
 point x y z = MkTuple x y z 1.0
 
@@ -31,11 +31,11 @@ export
 vector : (x,y,z : Double) -> Tuple
 vector x y z = MkTuple x y z 0.0
 
-export
+public export
 EPSILON : Double
 EPSILON = 0.00001
 
-export
+public export
 eq : Double -> Double -> Bool
 eq a b = abs (a - b) < EPSILON
 
@@ -43,6 +43,7 @@ public export
 [WithEpsilon] Eq Double where
   (==) = eq
 
+public export
 Eq Tuple where
   (MkTuple x0 y0 z0 w0) == (MkTuple x1 y1 z1 w1) = and [eq x0 x1, eq y0 y1, eq z0 z1, eq w0 w1]
 
